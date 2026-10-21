@@ -1,0 +1,24 @@
+{
+  "tutorial": [
+    "（placeholder）嗨！我是阿邁小精靈，咪咪咪～",
+    "（placeholder）阿萬每天早上去醫院上班，晚上 19:00 到家。",
+    "（placeholder）到家後可以吸貓、出門、滑手機，或是點電腦開播。",
+    "（placeholder）體力歸零會累倒，一整天都會睡掉喔。",
+    "（placeholder）第七天是生日直播，一定要撐到那天！"
+  ],
+  "collapse": "（placeholder）阿萬太累了……翹班睡了一整天，連直播也睡過去了。",
+  "forceSleep": "（placeholder）已經凌晨三點了，該睡了。",
+  "catRefuse": "（placeholder）貓咪不耐煩地走開了。",
+  "evaluation": {
+    "calm": "（placeholder）阿萬：今天還算平穩吧。",
+    "happy": "（placeholder）阿萬：大家好像蠻開心的！",
+    "excited": "（placeholder）阿萬：哇、好激動……有點累。"
+  },
+  "birthday": "（placeholder）今天是生日直播！大家都來了。",
+  "credits": [
+    "（placeholder）企劃：庚",
+    "（placeholder）文本：JM.",
+    "（placeholder）美術：待補",
+    "（placeholder）程式：待補"
+  ]
+}

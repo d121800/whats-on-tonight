@@ -1,0 +1,7 @@
+[
+  { "id": 1, "msg": "（placeholder）阿萬晚安～", "type": null, "who": null, "remark": null },
+  { "id": 2, "msg": "（placeholder）今天玩什麼？", "type": null, "who": null, "remark": null },
+  { "id": 3, "msg": "（placeholder）好恐怖喔喔喔", "type": "horror", "who": null, "remark": null },
+  { "id": 4, "msg": "（placeholder）這個衛教好實用", "type": "health", "who": null, "remark": null },
+  { "id": 5, "msg": "（placeholder）貓貓出現了！", "type": null, "who": "cat", "remark": null }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "group-everyone",
+    "name": "大家都在（名稱待確認）",
+    "isGroup": true,
+    "messages": [
+      { "from": "dog", "text": "（placeholder）今晚誰要直播？" },
+      { "from": "cat", "text": "（placeholder）我想睡。" }
+    ]
+  },
+  {
+    "id": "dm-dog",
+    "name": "狗（暫名）",
+    "isGroup": false,
+    "friendId": "dog",
+    "messages": [
+      { "from": "dog", "text": "（placeholder）要不要約出來走走？" }
+    ]
+  }
+]

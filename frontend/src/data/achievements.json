@@ -1,0 +1,5 @@
+[
+  { "id": "first-stream", "name": "初次開播（暫名）", "desc": "placeholder：完成第一場直播", "hidden": false },
+  { "id": "cat-lover",    "name": "貓奴（暫名）",     "desc": "placeholder：吸貓被拒絕一次", "hidden": false },
+  { "id": "survivor",     "name": "撐到生日（暫名）", "desc": "placeholder：七天內未累倒", "hidden": false }
+]
