@@ -4,12 +4,14 @@ import { useGameStore } from '../../stores/game'
 import { CONFIG } from '../../game/config'
 import { api } from '../../api/client'
 import friendsData from '../../data/friends.json'
+import BrakeQte from '../qte/BrakeQte.vue'
 
 const game = useGameStore()
 const remaining = ref(CONFIG.stream.liveSeconds)
 const chat = ref([])
 let timer = null
 let pool = []
+let elapsed = 0
 
 const moodIcon = { calm: '😐', happy: '😊', excited: '🤩' }
 const moodLabel = { calm: '平淡', happy: '開心', excited: '激動' }
@@ -18,26 +20,37 @@ function friendIcon(id) {
   return friendsData.find((f) => f.id === id)?.icon ?? '❓'
 }
 
+function tick() {
+  // QTE 進行中：直播倒數暫停
+  if (game.qteActive) return
+  elapsed++
+  remaining.value--
+  if (remaining.value % 3 === 0 && pool.length) {
+    chat.value.push(pool[Math.floor(Math.random() * pool.length)])
+    if (chat.value.length > 30) chat.value.shift()
+  }
+  if (remaining.value <= 0) {
+    clearInterval(timer)
+    game.finishLive()
+    return
+  }
+  game.maybeTriggerQte(elapsed)
+}
+
+function onQteDone(result) {
+  game.resolveQte(result)
+}
+
 onMounted(async () => {
   const s = game.currentStream
   pool = await api.getLiveComments({ type: s.type, who: s.friends[0] ?? null })
-  timer = setInterval(() => {
-    remaining.value--
-    if (remaining.value % 3 === 0 && pool.length) {
-      chat.value.push(pool[Math.floor(Math.random() * pool.length)])
-      if (chat.value.length > 30) chat.value.shift()
-    }
-    if (remaining.value <= 0) {
-      clearInterval(timer)
-      game.finishLive()
-    }
-  }, 1000)
+  timer = setInterval(tick, 1000)
 })
 onUnmounted(() => clearInterval(timer))
 </script>
 
 <template>
-  <section class="flex-1 flex flex-col">
+  <section class="relative flex-1 flex flex-col">
     <!-- 手機直式：上為直播畫面、下為聊天室；桌機改為左右 -->
     <div class="flex-1 flex flex-col md:flex-row">
       <div class="flex-1 p-4 flex flex-col gap-2">
@@ -60,7 +73,7 @@ onUnmounted(() => clearInterval(timer))
           </div>
         </div>
         <div class="grid grid-cols-3 gap-2">
-          <button v-for="(c, key) in CONFIG.stream.commands" :key="key" class="btn text-sm" @click="game.liveCommand(key)">
+          <button v-for="(c, key) in CONFIG.stream.commands" :key="key" class="btn text-sm" :disabled="game.qteActive" @click="game.liveCommand(key)">
             {{ c.label }}
           </button>
         </div>
@@ -77,5 +90,8 @@ onUnmounted(() => clearInterval(timer))
       <span>{{ game.currentStream.title }}</span>
       <span>{{ game.dateLabel }}　觀看 {{ 10 + game.stats.popularity }}（placeholder）</span>
     </footer>
+
+    <!-- QTE 疊層 -->
+    <BrakeQte v-if="game.qteActive" @done="onQteDone" />
   </section>
 </template>

@@ -57,10 +57,25 @@ export const CONFIG = {
     perStream: { subscribers: 1, shorts: 2, popularity: 5 }, // [暫定] 每場基礎成長
   },
 
+  // 直播中 QTE「前額葉失控 → 煞車」（hannah 2026-10-22 口述）
+  // 標記在軌道上來回移動，按下時停在目標區內為成功。目標區位置每次隨機。
+  qte: {
+    triggerStress: 60,        // [暫定] 壓力達此值時觸發
+    randomChancePerSec: 0.03, // [暫定] 每秒隨機觸發機率（壓力未達門檻也可能出現）
+    firstSafeSeconds: 8,      // [暫定] 開播前幾秒不觸發
+    maxPerStream: 2,          // [暫定] 每場最多次數
+    markerSpeed: 0.9,         // [暫定] 標記速度，單位：每秒跑過幾條軌道（0.9 ≈ 1.1 秒一趟）
+    zoneWidth: 0.18,          // [暫定] 目標區寬度，軌道長度的比例
+    timeLimitSec: 4,          // [暫定] 幾秒內沒按視為失敗
+    feedbackMs: 900,          // [暫定] 成功／失敗結果停留時間
+    successStress: -15,       // [暫定] 煞車成功壓力變化
+    failStress: +20,          // [暫定] 失控壓力變化
+  },
+
   // [手稿] 普通、瓦哈（極困難）；差異 [暫定]
   difficulty: {
-    normal: { label: '普通', staminaCostMul: 1.0, stressMul: 1.0 },
-    waha:   { label: '瓦哈', staminaCostMul: 1.5, stressMul: 1.5 },
+    normal: { label: '普通', staminaCostMul: 1.0, stressMul: 1.0, qteSpeedMul: 1.0, qteZoneMul: 1.0 },
+    waha:   { label: '瓦哈', staminaCostMul: 1.5, stressMul: 1.5, qteSpeedMul: 1.4, qteZoneMul: 0.7 },
   },
 }
 

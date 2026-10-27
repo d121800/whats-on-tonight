@@ -45,6 +45,7 @@ onMounted(() => {
     <div class="text-[10px] text-white/30 px-2 py-1 border-t border-white/10">
       scene={{ game.scene }} day={{ game.day }} clock={{ game.clockLabel }} stamina={{ game.stamina }} stress={{ game.stress }}
       <button class="ml-2 underline" @click="game.reset(); router.push({ name: 'title' })">reset</button>
+      <button v-if="game.scene === 'streamLive' && !game.qteActive" class="ml-2 underline" @click="game.qteActive = true; game.qteCountThisStream++">force qte</button>
     </div>
   </main>
 </template>

@@ -25,6 +25,9 @@ const freshState = () => ({
   collapsed: false,                 // 本輪是否曾累倒（供成就用）
   pendingSleepForced: false,
   currentStream: null,              // { title, type, friends, hours }
+  qteActive: false,                 // 直播中 QTE 進行中（倒數暫停）
+  qteCountThisStream: 0,
+  qteResults: [],                   // 本場 QTE 結果，供結算顯示
   lastResult: null,                 // 結算資料
   transitionNote: '',               // dayTransition 顯示的文字
   log: [],
@@ -142,7 +145,33 @@ export const useGameStore = defineStore('game', {
     startStream({ title, type, friends, hours }) {
       this.currentStream = { title, type, friends, hours }
       this.stress = CONFIG.stream.stressInit
+      this.qteActive = false
+      this.qteCountThisStream = 0
+      this.qteResults = []
       this.goto('streamLive')
+    },
+    /** 每秒由 StreamLiveScene 呼叫；回傳是否觸發 QTE */
+    maybeTriggerQte(elapsedSec) {
+      const q = CONFIG.qte
+      if (this.qteActive) return false
+      if (this.currentStream?.birthday) return false
+      if (elapsedSec < q.firstSafeSeconds) return false
+      if (this.qteCountThisStream >= q.maxPerStream) return false
+      const byStress = this.stress >= q.triggerStress
+      const byChance = Math.random() < q.randomChancePerSec
+      if (!byStress && !byChance) return false
+      this.qteActive = true
+      this.qteCountThisStream++
+      return true
+    },
+    resolveQte({ success, reason }) {
+      const q = CONFIG.qte
+      const raw = success ? q.successStress : q.failStress
+      const delta = Math.round(raw * (raw > 0 ? this.difficultyCfg.stressMul : 1))
+      this.stress = clamp(this.stress + delta, 0, CONFIG.stream.stressMax)
+      this.qteResults.push({ success, reason, delta })
+      this.qteActive = false
+      this.note('QTE ' + (success ? '煞車成功' : '失控') + ' 壓力' + (delta >= 0 ? '+' : '') + delta)
     },
     liveCommand(key) {
       const cmd = CONFIG.stream.commands[key]
@@ -164,7 +193,9 @@ export const useGameStore = defineStore('game', {
         mood: this.mood,
         staminaDelta: staminaFromStress + staminaFromHours,
         statsDelta: { ...gain },
+        qte: [...this.qteResults],
       }
+      this.qteActive = false
       this.changeStamina(staminaFromStress + staminaFromHours)
       this.note('直播「' + s.title + '」結束，壓力 ' + this.stress)
       this.goto('streamResult')
@@ -217,6 +248,9 @@ export const useGameStore = defineStore('game', {
     startBirthdayStream() {
       this.currentStream = { title: '生日直播', type: 'chat', friends: [], hours: 1, birthday: true }
       this.stress = CONFIG.stream.stressInit
+      this.qteActive = false
+      this.qteCountThisStream = 0
+      this.qteResults = []
       this.goto('birthdayStream')
     },
     finishGame() {

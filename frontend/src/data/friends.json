@@ -1,7 +1,7 @@
 [
-  { "id": "dog",   "name": "狗（暫名）",   "icon": "🐶", "note": "placeholder：手稿圖示為狗，名稱待確認" },
-  { "id": "cat",   "name": "貓（暫名）",   "icon": "🐱", "note": "placeholder：手稿圖示為貓，名稱待確認" },
-  { "id": "seal",  "name": "海豹（暫名）", "icon": "🦭", "note": "placeholder：手稿圖示為海豹狀角色" },
-  { "id": "ghost", "name": "幽靈（暫名）", "icon": "👻", "note": "placeholder" },
-  { "id": "chick", "name": "雞（暫名）",   "icon": "🐔", "note": "placeholder" }
+  { "id": "dog",   "name": "Matsuko",   "icon": "🐶", "note": "placeholder：手稿圖示為狗，名稱待確認" },
+  { "id": "cat",   "name": "貓下去",   "icon": "🐱", "note": "placeholder：手稿圖示為貓，名稱待確認" },
+  { "id": "seal",  "name": "豹子頭", "icon": "🦭", "note": "placeholder：手稿圖示為海豹狀角色" },
+  { "id": "ghost", "name": "瓦哈哈", "icon": "👻", "note": "placeholder" },
+  { "id": "chick", "name": "花雕雞",   "icon": "🐔", "note": "placeholder" }
 ]

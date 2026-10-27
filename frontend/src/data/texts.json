@@ -15,6 +15,12 @@
     "excited": "（placeholder）阿萬：哇、好激動……有點累。"
   },
   "birthday": "（placeholder）今天是生日直播！大家都來了。",
+  "qte": {
+    "prompt": "（placeholder）前額葉失控！點一下煞車！",
+    "success": "（placeholder）煞車成功，冷靜下來了。",
+    "fail": "（placeholder）失控了……",
+    "timeout": "（placeholder）來不及反應……"
+  },
   "credits": [
     "（placeholder）企劃：庚、JM.",
     "（placeholder）文本：待補",
