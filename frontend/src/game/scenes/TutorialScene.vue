@@ -3,7 +3,7 @@
 //   intro  訊息畫面，阿邁自我介紹
 //   room   房間裡阿邁站在桌邊講解，底部對話框
 //   focus  暗幕聚焦螢幕，點螢幕 → 開播準備
-// 右下角橘色 Skip 隨時可跳過 → 房間。
+// 右下角橘色 Skip 隨時可跳過 → 一樣進開播準備。
 import { ref, computed } from 'vue'
 import { useGameStore } from '../../stores/game'
 import RoomInfoPanel from '../../components/RoomInfoPanel.vue'

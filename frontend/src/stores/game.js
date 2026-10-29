@@ -114,10 +114,10 @@ export const useGameStore = defineStore('game', {
       this.tutorialDone = true
       this.goto('streamSetup')
     },
-    /** 教學 Skip：回房間自由行動 [暫定] */
+    /** 教學 Skip：同樣進開播準備（hannah 2026-10-29） */
     skipTutorial() {
       this.tutorialDone = true
-      this.goto('room')
+      this.goto('streamSetup')
     },
 
     // ---------- 日常 ----------
