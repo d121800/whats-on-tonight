@@ -1,8 +1,8 @@
 [
-  { "id": "action",  "name": "動作遊戲", "icon": "🎮" },
-  { "id": "romance", "name": "戀愛遊戲", "icon": "💘" },
-  { "id": "horror",  "name": "恐怖遊戲", "icon": "👻" },
-  { "id": "health",  "name": "衛教",     "icon": "🩺" },
-  { "id": "chat",    "name": "雜談",     "icon": "💬" },
-  { "id": "multi",   "name": "團康遊戲", "icon": "👥" }
+  { "id": "action",  "name": "動作遊戲", "icon": "🔪", "note": "placeholder：草圖 13 的刀，對應關係待確認" },
+  { "id": "romance", "name": "戀愛遊戲", "icon": "❤️", "note": "草圖 3、13 的愛心" },
+  { "id": "horror",  "name": "恐怖遊戲", "icon": "💀", "note": "placeholder：草圖 13 骷髏；草圖 3 為幽靈" },
+  { "id": "health",  "name": "衛教",     "icon": "✚",  "note": "草圖 13 的十字" },
+  { "id": "chat",    "name": "雜談",     "icon": "💬", "note": "草圖 13 的對話泡泡" },
+  { "id": "multi",   "name": "團康遊戲", "icon": "🎮", "note": "placeholder：草圖未畫圖示" }
 ]

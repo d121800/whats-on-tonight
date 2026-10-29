@@ -1,5 +1,6 @@
 [
-  { "id": "first-stream", "name": "初次開播（暫名）", "desc": "placeholder：完成第一場直播", "hidden": false },
-  { "id": "cat-lover",    "name": "貓奴（暫名）",     "desc": "placeholder：吸貓被拒絕一次", "hidden": false },
-  { "id": "survivor",     "name": "撐到生日（暫名）", "desc": "placeholder：七天內未累倒", "hidden": false }
+  { "id": "health-god",   "name": "衛教之神",   "desc": "（placeholder）條件待定：衛教直播相關", "hidden": false },
+  { "id": "night-bed",    "name": "熬夜Bed",    "desc": "（placeholder）條件待定：太晚睡相關", "hidden": false },
+  { "id": "overworked",   "name": "我過勞了",   "desc": "（placeholder）草圖 7：體力低於 50%？條件待確認", "hidden": false },
+  { "id": "lobe-failure", "name": "前額葉失靈", "desc": "（placeholder）條件待定：煞車 QTE 失控相關", "hidden": false }
 ]

@@ -8,7 +8,7 @@ import { loadSave, writeSave, clearSave } from '../game/save'
 // 流程對照 documents/畫面流程與狀態機.md
 // ------------------------------------------------------------
 export const SCENES = [
-  'tutorial', 'room', 'phone', 'streamSetup', 'streamLive', 'streamResult',
+  'tutorial', 'room', 'phone', 'meetup', 'streamSetup', 'streamLive', 'streamResult',
   'sleep', 'collapse', 'dayTransition', 'birthdayStream', 'ending',
 ]
 
@@ -26,6 +26,7 @@ const freshState = () => ({
   collapsed: false,                 // 本輪是否曾累倒（供成就用）
   pendingSleepForced: false,
   currentStream: null,              // { title, type, friends, hours }
+  currentMeetup: null,              // { friendId }，約出來見面中
   qteActive: false,                 // 直播中 QTE 進行中（倒數暫停）
   qteCountThisStream: 0,
   qteResults: [],                   // 本場 QTE 結果，供結算顯示
@@ -141,6 +142,16 @@ export const useGameStore = defineStore('game', {
       this.phoneUnread = false
       if (!this.advanceTime(CONFIG.phone.minutes)) this.goto('phone')
     },
+    /** 手機 Line 約出來 → 雙人見面畫面（出門的唯一入口） */
+    startMeetup(friendId) {
+      this.currentMeetup = { friendId }
+      this.goto('meetup')
+    },
+    endMeetup() {
+      this.currentMeetup = null
+      this.goto('room')
+    },
+    /** 出門：由 MeetupScene 呼叫；時間 +1~3 小時、體力 +25~40 */
     goOut() {
       const o = CONFIG.stamina.out
       const hours = randInt(o.hoursMin, o.hoursMax)

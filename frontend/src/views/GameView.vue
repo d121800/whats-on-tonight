@@ -5,6 +5,7 @@ import { useGameStore } from '../stores/game'
 import TutorialScene from '../game/scenes/TutorialScene.vue'
 import RoomScene from '../game/scenes/RoomScene.vue'
 import PhoneScene from '../game/scenes/PhoneScene.vue'
+import MeetupScene from '../game/scenes/MeetupScene.vue'
 import StreamSetupScene from '../game/scenes/StreamSetupScene.vue'
 import StreamLiveScene from '../game/scenes/StreamLiveScene.vue'
 import StreamResultScene from '../game/scenes/StreamResultScene.vue'
@@ -18,6 +19,7 @@ const sceneMap = {
   tutorial: TutorialScene,
   room: RoomScene,
   phone: PhoneScene,
+  meetup: MeetupScene,
   streamSetup: StreamSetupScene,
   streamLive: StreamLiveScene,
   streamResult: StreamResultScene,

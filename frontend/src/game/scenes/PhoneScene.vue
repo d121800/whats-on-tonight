@@ -10,11 +10,8 @@ const openChat = ref(null)
 
 // 進入手機已由 store.openPhone() 扣 30 分鐘（草圖 2）
 function meetup(chat) {
-  // [手稿] 聊天可「約出來」→ 雙人見面事件；見面畫面待做（第三批），暫以出門處理
-  // 出門唯一入口在這裡：房間沒有獨立出門鈕（hannah 2026-10-28）
-  game.goOut()
-  openChat.value = null
-  if (game.scene === 'phone') game.goto('room')
+  // [手稿] 聊天可「約出來」→ 雙人見面畫面（出門唯一入口，房間沒有出門鈕；hannah 2026-10-28）
+  game.startMeetup(chat.friendId)
 }
 </script>
 
@@ -54,7 +51,7 @@ function meetup(chat) {
           <span class="text-xs text-white/50">{{ m.from }}</span><br />{{ m.text }}
         </div>
       </div>
-      <button v-if="!openChat.isGroup" class="btn-primary" @click="meetup(openChat)">約出來（暫以出門處理）</button>
+      <button v-if="!openChat.isGroup" class="btn-primary" @click="meetup(openChat)">約出來</button>
     </div>
   </section>
 </template>

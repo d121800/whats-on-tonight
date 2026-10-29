@@ -26,6 +26,27 @@ export function clearSave() {
   }
 }
 
+// 偏好設定（難度等），與存檔分開，不隨新局清除
+const PREFS_KEY = 'wot:prefs:v1'
+const DEFAULT_PREFS = { difficulty: 'normal' }
+
+export function loadPrefs() {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY)
+    return { ...DEFAULT_PREFS, ...(raw ? JSON.parse(raw) : {}) }
+  } catch {
+    return { ...DEFAULT_PREFS }
+  }
+}
+
+export function writePrefs(patch) {
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({ ...loadPrefs(), ...patch }))
+  } catch {
+    /* ignore */
+  }
+}
+
 /** 下載紀錄：手稿有此想法，格式 [暫定] 為 JSON */
 export function exportSave(state) {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' })

@@ -1,4 +1,5 @@
 <script setup>
+// 開播準備（草圖 13 左）：名稱、type 圖示、人（🚫 不選＋五位朋友）、預計時數 1~4、開始
 import { ref, computed } from 'vue'
 import { useGameStore } from '../../stores/game'
 import { CONFIG } from '../../game/config'
@@ -34,41 +35,56 @@ function start() {
 
 <template>
   <section class="flex-1 flex flex-col p-4 gap-4">
-    <h2 class="text-lg font-bold">開播設定</h2>
-
-    <label class="flex flex-col gap-1 text-sm">
-      直播標題
-      <input v-model="title" class="input" placeholder="自填標題" />
-    </label>
-
-    <div class="text-sm">
-      直播 type
-      <div class="grid grid-cols-3 gap-2 mt-1">
-        <button v-for="t in types" :key="t.id" class="btn text-sm" :class="{ 'bg-brand': type === t.id }" @click="type = t.id">
-          {{ t.icon }} {{ t.name }}
-        </button>
-      </div>
-    </div>
-
-    <div class="text-sm">
-      朋友／參與者（可不選）
-      <div class="flex flex-wrap gap-2 mt-1">
-        <button v-for="f in friends" :key="f.id" class="btn text-sm" :class="{ 'bg-brand': picked.includes(f.id) }" @click="toggle(f.id)">
-          {{ f.icon }} {{ f.name }}
-        </button>
-      </div>
-    </div>
+    <h2 class="text-lg font-bold">開播準備</h2>
 
     <label class="flex items-center gap-2 text-sm">
-      預計直播時數
-      <select v-model.number="hours" class="input w-24">
-        <option v-for="h in hourOptions" :key="h" :value="h">{{ h }} 小時</option>
-      </select>
+      <span class="shrink-0">名稱</span>
+      <input v-model="title" class="input flex-1" placeholder="自填直播名稱" />
     </label>
 
-    <div class="mt-auto grid grid-cols-2 gap-2">
-      <button class="btn" @click="game.goto('room')">取消</button>
-      <button class="btn-primary" @click="start">開始直播</button>
+    <div class="text-sm">
+      type
+      <div class="grid grid-cols-6 gap-1 mt-1">
+        <button
+          v-for="t in types" :key="t.id"
+          class="btn flex-col gap-0 px-1 py-2"
+          :class="{ 'bg-brand': type === t.id }"
+          :title="t.name"
+          @click="type = t.id"
+        >
+          <span class="text-2xl">{{ t.icon }}</span>
+          <span class="text-[10px] text-white/70">{{ t.name }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="text-sm">
+      人
+      <div class="grid grid-cols-6 gap-1 mt-1">
+        <button class="btn flex-col gap-0 px-1 py-2" :class="{ 'bg-brand': picked.length === 0 }" title="不找人" @click="picked = []">
+          <span class="text-2xl">🚫</span>
+          <span class="text-[10px] text-white/70">不找人</span>
+        </button>
+        <button
+          v-for="f in friends" :key="f.id"
+          class="btn flex-col gap-0 px-1 py-2"
+          :class="{ 'bg-brand': picked.includes(f.id) }"
+          :title="f.name"
+          @click="toggle(f.id)"
+        >
+          <span class="text-2xl">{{ f.icon }}</span>
+          <span class="text-[10px] text-white/70 truncate w-full">{{ f.name }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-auto flex items-center gap-2 text-sm">
+      預計
+      <select v-model.number="hours" class="input w-24">
+        <option v-for="h in hourOptions" :key="h" :value="h">{{ h }} hr</option>
+      </select>
+      <button class="btn ml-auto" @click="game.goto('room')">取消</button>
+      <button class="btn-primary" @click="start">開始</button>
     </div>
   </section>
 </template>

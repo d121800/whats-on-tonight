@@ -15,6 +15,9 @@
   "forceSleep": "（placeholder）已經凌晨三點了，該睡了。",
   "catRefuse": "（placeholder）貓咪不耐煩地走開了。",
   "chatIcon": "（placeholder）這個功能還沒決定要做什麼。",
+  "meetup": {
+    "line": "（placeholder）和阿萬並肩走了一段路，聊了很多。"
+  },
   "evaluation": {
     "calm": "（placeholder）阿萬：今天還算平穩吧。",
     "happy": "（placeholder）阿萬：大家好像蠻開心的！",
