@@ -8,8 +8,10 @@ const game = useGameStore()
 const tab = ref('social') // social | line
 const openChat = ref(null)
 
+// 進入手機已由 store.openPhone() 扣 30 分鐘（草圖 2）
 function meetup(chat) {
-  // [手稿] 聊天可「約出來」→ 雙人見面事件；事件內容待定，暫以出門處理
+  // [手稿] 聊天可「約出來」→ 雙人見面事件；見面畫面待做（第三批），暫以出門處理
+  // 出門唯一入口在這裡：房間沒有獨立出門鈕（hannah 2026-10-28）
   game.goOut()
   openChat.value = null
   if (game.scene === 'phone') game.goto('room')

@@ -4,5 +4,5 @@
   { "id": "horror",  "name": "恐怖遊戲", "icon": "👻" },
   { "id": "health",  "name": "衛教",     "icon": "🩺" },
   { "id": "chat",    "name": "雜談",     "icon": "💬" },
-  { "id": "multi",   "name": "多人遊戲", "icon": "👥" }
+  { "id": "multi",   "name": "團康遊戲", "icon": "👥" }
 ]

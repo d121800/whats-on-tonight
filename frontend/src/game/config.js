@@ -31,6 +31,10 @@ export const CONFIG = {
     { at: 27 * H, pct: 60 },
   ],
 
+  phone: {
+    minutes: 30,                  // [手稿] 草圖 2：手機 30 分鐘
+  },
+
   collapse: {
     // [手稿] 體力 ≤ 0 觸發累倒跳日，跳過隔天整天。醒來時間與體力 [暫定]
     wakeStaminaPct: 60,

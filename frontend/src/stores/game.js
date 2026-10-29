@@ -22,6 +22,7 @@ const freshState = () => ({
   stats: { ...CONFIG.stats.initial },
   catCountToday: 0,
   tutorialDone: false,
+  phoneUnread: true,                // 手機圖示紅點：每天到家時有新訊息 [暫定]
   collapsed: false,                 // 本輪是否曾累倒（供成就用）
   pendingSleepForced: false,
   currentStream: null,              // { title, type, friends, hours }
@@ -108,7 +109,13 @@ export const useGameStore = defineStore('game', {
     },
 
     // ---------- 教學 ----------
+    /** 教學走完：聚焦螢幕後點螢幕 → 直接進開播準備（草圖 2 之後接開播準備畫面） */
     finishTutorial() {
+      this.tutorialDone = true
+      this.goto('streamSetup')
+    },
+    /** 教學 Skip：回房間自由行動 [暫定] */
+    skipTutorial() {
       this.tutorialDone = true
       this.goto('room')
     },
@@ -128,6 +135,11 @@ export const useGameStore = defineStore('game', {
       this.note('吸貓 +' + gain)
       this.advanceTime(c.minutes)
       return { refused: false, gain }
+    },
+    /** 滑手機：耗時 30 分鐘後進 phone；若推進時間後被強制睡覺／累倒則不進 */
+    openPhone() {
+      this.phoneUnread = false
+      if (!this.advanceTime(CONFIG.phone.minutes)) this.goto('phone')
     },
     goOut() {
       const o = CONFIG.stamina.out
@@ -239,6 +251,7 @@ export const useGameStore = defineStore('game', {
       this.day = Math.min(last, this.day + delta)
       this.clock = CONFIG.game.homeTime
       this.catCountToday = 0
+      this.phoneUnread = true
       if (work) this.changeStamina(CONFIG.stamina.work)
       if (this.isBirthday && CONFIG.stream.birthdayStaminaFill) this.stamina = CONFIG.stamina.max
       this.goto('dayTransition')
