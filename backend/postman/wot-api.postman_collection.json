@@ -1,0 +1,1265 @@
+{
+  "info": {
+    "name": "今晚播什麼？後端 API",
+    "description": "規格見 backend/API.md。先在 DB 執行 db/schema.sql 與 db/seed-test.sql。\n\nbirthmsg 每分鐘限 3 次，1～5 資料夾連續跑會撞到 429。本機測試建議：\n1. 啟動後端時設 SETTING_CACHE_SECONDS=5，讓設定改了馬上生效。\n2. DB 執行 update \"WOT_Setting\" set \"value\"='100' where \"type\"='api' and \"name\"='birthmsg.perMinute';\n3. 跑 1～5、7 資料夾。\n4. 改回 '3'，等 1 分鐘，再單獨跑 6「頻率限制」。",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. start",
+      "item": [
+        {
+          "name": "開始時間記入",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"isSuccess = true\", () => pm.expect(pm.response.json().isSuccess).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/start",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "start"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. comments（一般）",
+      "item": [
+        {
+          "name": "horror，不帶 who",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"回傳陣列\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));",
+                  "pm.test(\"來源都是 liveTxt\", () => pm.response.json().forEach(c => pm.expect(c.source===\"liveTxt\").to.eql(true)));",
+                  "pm.test(\"type 是 null 或 horror\", () => pm.response.json().forEach(c => pm.expect(c.type===null||c.type===\"horror\").to.eql(true)));",
+                  "pm.test(\"who 都是 null\", () => pm.response.json().forEach(c => pm.expect(c.who===null).to.eql(true)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "seed-test 預期：通用 2 筆 + 恐怖 1 筆",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=horror",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "horror"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "horror + ghost",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"who 是 null 或 ghost\", () => pm.response.json().forEach(c => pm.expect(c.who===null||c.who===\"ghost\").to.eql(true)));",
+                  "pm.test(\"包含 ghost 限定留言\", () => pm.expect(pm.response.json().some(c => c.who===\"ghost\")).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "seed-test 預期：多出恐怖＋幽靈那筆",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=horror&who=ghost",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "horror"
+                },
+                {
+                  "key": "who",
+                  "value": "ghost"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "who=null 字串視為不限朋友",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"who 都是 null\", () => pm.response.json().forEach(c => pm.expect(c.who===null).to.eql(true)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=horror&who=null",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "horror"
+                },
+                {
+                  "key": "who",
+                  "value": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "who 空字串",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"who 都是 null\", () => pm.response.json().forEach(c => pm.expect(c.who===null).to.eql(true)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=health&who=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "health"
+                },
+                {
+                  "key": "who",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "不存在的 type 視為通用",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"type 都是 null\", () => pm.response.json().forEach(c => pm.expect(c.type===null).to.eql(true)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=xyz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "xyz"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "完全不帶參數",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"只有通用留言\", () => pm.response.json().forEach(c => pm.expect(c.type===null && c.who===null).to.eql(true)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. comments（生日）",
+      "item": [
+        {
+          "name": "生日 預設",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"回傳陣列\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));",
+                  "pm.test(\"生日留言排在前面\", () => { const r=pm.response.json(); const i=r.findIndex(c=>c.source===\"liveTxt\"); if(i>=0) pm.expect(r.slice(i).every(c=>c.source===\"liveTxt\")).to.eql(true); });",
+                  "pm.test(\"birthMsg 有 name、type=birthday\", () => pm.response.json().filter(c=>c.source===\"birthMsg\").forEach(c=>{pm.expect(c.name).to.be.a(\"string\"); pm.expect(c.type).to.eql(\"birthday\");}));",
+                  "pm.test(\"未審核的不出現\", () => pm.expect(pm.response.json().some(c=>c.msg.includes(\"未審核\"))).to.eql(false));",
+                  "pm.test(\"補位只有 birthday 或通用\", () => pm.response.json().filter(c=>c.source===\"liveTxt\").forEach(c=>pm.expect(c.type===null||c.type===\"birthday\").to.eql(true)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=birthday",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "birthday"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "生日 limit=1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"只有 1 筆\", () => pm.expect(pm.response.json().length).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=birthday&limit=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "birthday"
+                },
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "生日 latest",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"回傳陣列\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=birthday&order=latest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "birthday"
+                },
+                {
+                  "key": "order",
+                  "value": "latest"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "limit 超過上限",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"回傳陣列\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "以上限 500 計，不報錯",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=birthday&limit=99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "birthday"
+                },
+                {
+                  "key": "limit",
+                  "value": "99999"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "limit 不是數字 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = limit 必須是正整數\", () => pm.expect(pm.response.json().error).to.eql(\"limit 必須是正整數\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=birthday&limit=abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "birthday"
+                },
+                {
+                  "key": "limit",
+                  "value": "abc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "limit=0 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = limit 必須是正整數\", () => pm.expect(pm.response.json().error).to.eql(\"limit 必須是正整數\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=birthday&limit=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "birthday"
+                },
+                {
+                  "key": "limit",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "order 錯誤 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = order 只能是 random 或 latest\", () => pm.expect(pm.response.json().error).to.eql(\"order 只能是 random 或 latest\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?type=birthday&order=hot",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "birthday"
+                },
+                {
+                  "key": "order",
+                  "value": "hot"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. birthmsg",
+      "item": [
+        {
+          "name": "正常寫入",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"isSuccess = true\", () => pm.expect(pm.response.json().isSuccess).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "SQL 字元與 <3 應可正常寫入；寫入後 isOk=false，不會出現在生日留言",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"Postman\", \"msg\": \"（測試）生日快樂！\\nI'm here <3\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "name 空白 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = name 不可空白\", () => pm.expect(pm.response.json().error).to.eql(\"name 不可空白\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"   \", \"msg\": \"hi\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "msg 只有零寬字元 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = msg 不可空白\", () => pm.expect(pm.response.json().error).to.eql(\"msg 不可空白\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"a\", \"msg\": \"\\u200B\\u200B\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. birthmsg 檢核",
+      "item": [
+        {
+          "name": "script 標籤 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = 內容含不允許的字元\", () => pm.expect(pm.response.json().error).to.eql(\"內容含不允許的字元\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"a\", \"msg\": \"<script>alert(1)</script>\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "img onerror → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = 內容含不允許的字元\", () => pm.expect(pm.response.json().error).to.eql(\"內容含不允許的字元\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"a\", \"msg\": \"<img src=x onerror=alert(1)>\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "name 41 字 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = name 最多 40 字\", () => pm.expect(pm.response.json().error).to.eql(\"name 最多 40 字\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字\", \"msg\": \"x\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "msg 201 字 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = msg 最多 200 字\", () => pm.expect(pm.response.json().error).to.eql(\"msg 最多 200 字\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"a\", \"msg\": \"字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "name 不是字串 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = name 必須是字串\", () => pm.expect(pm.response.json().error).to.eql(\"name 必須是字串\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": 123, \"msg\": \"hi\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "body 不是 JSON → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));",
+                  "pm.test(\"error = body 必須是 JSON 物件\", () => pm.expect(pm.response.json().error).to.eql(\"body 必須是 JSON 物件\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "not json",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. 頻率限制（單獨執行）",
+      "description": "連續送 4 次，第 4 次應為 429。執行前先等 1 分鐘。",
+      "item": [
+        {
+          "name": "第 1 次",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"\", \"msg\": \"\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "第 2 次",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"\", \"msg\": \"\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "第 3 次",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"\", \"msg\": \"\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "第 4 次",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 429\", () => pm.response.to.have.status(429));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "description": "",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"\", \"msg\": \"\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. 其他",
+      "item": [
+        {
+          "name": "不存在的路徑 → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"isSuccess = false\", () => pm.expect(pm.response.json().isSuccess).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/nope",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "nope"
+              ]
+            }
+          }
+        },
+        {
+          "name": "CORS 預檢（允許的來源）",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"有 Access-Control-Allow-Origin\", () => pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).to.eql(\"http://localhost:5173\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://localhost:5173"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST"
+              },
+              {
+                "key": "Access-Control-Request-Headers",
+                "value": "content-type"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            }
+          }
+        },
+        {
+          "name": "CORS 預檢（不允許的來源）",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"沒有 Access-Control-Allow-Origin\", () => pm.expect(pm.response.headers.has(\"Access-Control-Allow-Origin\")).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "https://evil.example.com"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/birthmsg",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "birthmsg"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+# 連線資訊一律由環境變數提供，不寫進 git。說明見 backend/README.md。
+server:
+  port: ${PORT:8080}            # Render 會自動給 PORT
+  compression:
+    enabled: true
+    mime-types: application/json
+    min-response-size: 1024
+  error:
+    whitelabel:
+      enabled: false
+
+spring:
+  application:
+    name: wot-backend
+  datasource:
+    url: ${DB_URL}              # 例：jdbc:postgresql://<host>:5432/postgres?sslmode=require
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 3      # Render 免費方案 + Supabase pooler，連線數保守
+      minimum-idle: 0
+      connection-timeout: 10000
+
+wot:
+  # 允許呼叫 API 的前端來源，逗號分隔
+  cors-origins: ${CORS_ORIGINS:http://localhost:5173}
+  # 前面有幾層 proxy：本機 0（直接用連線 IP）；Render 設 1（取 X-Forwarded-For 最後一個值）
+  proxy-hops: ${PROXY_HOPS:0}
+  # WOT_Setting 快取秒數：改了 DB 設定，最晚這麼久後生效
+  setting-cache-seconds: ${SETTING_CACHE_SECONDS:300}
+  # POST body 上限（bytes）
+  max-body-bytes: 4096
